@@ -1,50 +1,48 @@
 import java.util.*;
 
-public class FindTheMinimumAmountOfTimeToBrewPotions {
-    //dùng quy hoạch động cho bài này
-    public long minTimeToBrew(int[] skill, int[] mana) {
+public class FindMinimumAmountOfTimeToBrewPotions {
+    public long minTime(int[] skill, int[] mana) {
         int n = skill.length;
         int m = mana.length;
+        if (n == 0 || m == 0) return 0L;
 
-        long[][] dp = new long[n][m];
-        dp[0][0] = (long) skill[0] * mana[0];
+        long start = 0L;
+        long[] prefPrev = new long[n];
+        long[] prefCurrStart = new long[n];
 
-        // Wizard 0 làm hết các potion
         for (int j = 1; j < m; j++) {
-            dp[0][j] = dp[0][j - 1] + (long) skill[0] * mana[j];
-        }
+            prefPrev[0] = (long) skill[0] * mana[j - 1];
+            for (int i = 1; i < n; i++) prefPrev[i] = prefPrev[i - 1] + (long) skill[i] * mana[j - 1];
 
-        // Potion 0 qua hết các wizard
-        for (int i = 1; i < n; i++) {
-            dp[i][0] = dp[i - 1][0] + (long) skill[i] * mana[0];
-        }
+            prefCurrStart[0] = 0L;
+            for (int i = 1; i < n; i++) prefCurrStart[i] = prefCurrStart[i - 1] + (long) skill[i - 1] * mana[j];
 
-        // Các ô còn lại
-        for (int i = 1; i < n; i++) {
-            for (int j = 1; j < m; j++) {
-                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]) + (long) skill[i] * mana[j];
+            long maxA = Long.MIN_VALUE;
+            for (int i = 0; i < n; i++) {
+                long A = prefPrev[i] - prefCurrStart[i];
+                if (A > maxA) maxA = A;
             }
+            start += maxA;
         }
 
-        return dp[n - 1][m - 1];
+        long totalLast = 0L;
+        for (int i = 0; i < n; i++) totalLast += (long) skill[i] * mana[m - 1];
+        return start + totalLast;
     }
 
     public static void main(String[] args) {
-        FindTheMinimumAmountOfTimeToBrewPotions solver = new FindTheMinimumAmountOfTimeToBrewPotions();
+        FindMinimumAmountOfTimeToBrewPotions solver = new FindMinimumAmountOfTimeToBrewPotions();
 
-        // Test 1
         int[] skill1 = {1, 5, 2, 4};
-        int[] mana1 = {5, 1, 4, 2};
-        System.out.println(solver.minTimeToBrew(skill1, mana1)); // 110
+        int[] mana1  = {5, 1, 4, 2};
+        System.out.println(solver.minTime(skill1, mana1)); // 110
 
-        // Test 2
-        int[] skill2 = {1, 1, 1};
-        int[] mana2 = {1, 1, 1};
-        System.out.println(solver.minTimeToBrew(skill2, mana2)); // 5
+        int[] skill2 = {1,1,1};
+        int[] mana2  = {1,1,1};
+        System.out.println(solver.minTime(skill2, mana2)); // 5
 
-        // Test 3
-        int[] skill3 = {1, 2, 3, 4};
-        int[] mana3 = {1, 2};
-        System.out.println(solver.minTimeToBrew(skill3, mana3)); // 21
+        int[] skill3 = {1,2,3,4};
+        int[] mana3  = {1,2};
+        System.out.println(solver.minTime(skill3, mana3)); // 21
     }
 }
