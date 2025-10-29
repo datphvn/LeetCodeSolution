@@ -1,4 +1,4 @@
-public class SingleNumber {
+class SingleNumber {
     // Dùng XOR
     public int singleNumber(int[] nums) {
         int result = 0;
